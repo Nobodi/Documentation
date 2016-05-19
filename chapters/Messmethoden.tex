@@ -1,0 +1,57 @@
+\newpage
+
+% Erwähnen, wie viel Datenvolumen jede Methode benötigt
+
+\section{Messmethoden}
+
+Es existieren unterschiedliche Methoden um die Bandbreite zu bestimmen. Ein Verfahren zur Bestimmung der Bandbreite ist der Download. Durch den Download einer entsprechend großen Datei kann der tatsächlich erreichte Datendurchsatz ermittelt werden. Diese Methode ist die genaueste, eignet sich allerdings nicht so gut, da zu viel Daten anfallen und es unter Umständen sehr lange dauern kann. Aus diesem Grunde werden im Folgenden Methoden vorgestellt, welche diese Probleme umgehen, und trotzdem die Bandbreite ermitteln können.
+\\\\
+Grob können diese Methoden in zwei Klassen eingeteilt werden. Die erste Klasse bestimmt die Bandbreite durch Verzögerungszeiten einzelner versendeter Pakete, die durch weiteren Datenverkehr verursacht werden. Diese Klasse wird als Cross Traffic Estimation bezeichnet. Die zweite Klasse bestimmt Bandbreiten mittels Überlastung (Congestion) der Verbindung. Dabei wird die Bandbreite der maximalen Bandbreite bis zur Überlastung des Kanals schrittweise durch Versenden von Paketen angepasst. Diese Klasse wird als Self Induced Congestion bezeichnet.
+
+\subsection{Paketumlaufzeit (Round Trip Time)}
+
+Diese Methode entspricht in etwa dem Download, allerdings kann diese Methode auch mit kleineren Datenmengen schon ziemlich genau den Datendurchsatz bestimmen. Unter der Round Trip Time (RTT) wird die Zeit verstanden, die ein Paket benötigt, um von einer Quelle zum Ziel und wieder zurück zu kommen. Dieses Konzept wird auf den Download einer kleineren Datenmenge angewendet. Zur Berechnung der Bandbreite wird eine kleine Datenmenge (ca. 0,5 MB) geladen und die Zeit zwischen Anfrage und Empfang der Datei gemessen. Die Bandbreite (B\textsubscript{RTT}) berechnet sich indem die Paketgröße oder bezogene Datenmenge (P) durch die Paketumlaufzeit (RTT) geteilt wird.
+
+\begin{align*}
+B\textsubscript{RTT} =\frac { P} {RTT}
+\end{align*}
+
+\subsection{Packet Pair (PP)}
+
+Die Paket Pair Methode gehört zur Klasse der Cross Traffic Estimation Methoden. Bei dieser Methode werden zwei Pakete gleicher Größe von einer Quelle zum Ziel und wieder zurück gesendet. Die beim Absenden und Empfangen gemessenen Ankunftszeiten der Pakete dienen zur Berechnung der Zeitunterschiede $\Delta$t\textsubscript{out} beim Senden und $\Delta$t\textsubscript{in} beim Empfangen. 
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=0.54]{images/PP.png}
+		\caption{Schematischer Ablauf der Paket Pair Methode}
+		\label{pp}
+\end{figure}
+
+In Abbildung \ref{pp} ist der Ablauf dieser Methode schematisch dargestellt. Die Abbildung zeigt eine Verbindung zwischen einem Sender und Empfänger. Der schmale Teil der Verbindung stellt einen Bottleneck dar. Die beiden unterschiedlichen Pakete sind grün und blau gefärbt. Vom Sender werden sie mit einer Zeitdifferenz von  $\Delta$t\textsubscript{out} losgeschickt. Mit diesem Abstand gelangen sie zum Bottleneck. Das blaue Paket wird durch den Bottleneck ohne Verzögerung gesendet. Aufgrund von weiterem Datenverkehr auf dieser Leitung kann es vorkommen, dass das grüne Paket nicht direkt hinter dem blauen Paket gesendet wird. Es wird zwischengepuffert und die Zeit zwischen den Paketen vergrößert sich. Durch diese auftretende Zeitdifferenz zwischen den Deltas kann eine Bandbreite berechnet werden. Zur Berechnung der Bandbreite (B\textsubscript{PP}) wird die Paketgröße (P) eines Paketes durch die Differenz der beiden Deltas geteilt.\cite{Nettimer}
+
+\begin{align*}
+B\textsubscript{PP} = \frac { P}  {|(\Delta\textsubscript{in} - \Delta\textsubscript{out})|}
+\end{align*}
+
+\subsection{Packet Train (PT)}
+
+Die Paket Train Methode gehört zur Klasse der Self Induced Congestion Methoden. Sie basiert auf dem Versenden von Paketzügen. Dabei besteht ein Paketzug aus mehreren Paketen der Anzahl n, welche in gleichem Abstand $\Delta$t voneinander versendet werden. Die Größe der Pakete ist P Bytes und ist für alle Pakete gleich. Die Übertragungszeit eines Paketes des Paketzuges beträgt T. Der Abstand $\Delta$t zwischen den Paketen wird vom Sender an die gegebene Situation angepasst.
+Aus diesen Werten kann der Sender eine Übertragungsrate R berechnen, mit der die Pakete versendet werden.
+ 
+\begin{align*}
+R\textsubscript{PT} = \frac {P} {T + \Delta t}
+\end{align*}
+
+Vor dem Versenden der Pakete wird jedes mit einem Zeitstempel t\textsubscript{i} versehen. Der Empfänger berechnet nach Empfang der Pakete mit Hilfe der Ankunftszeit a\textsubscript{i} des jeweiligen Paketes die relative Verzögerung D\textsubscript{i} = a\textsubscript{i} - t\textsubscript{i}. Wenn alle Verzögerungswerte der Pakete berechnet wurden, werden diese miteinander verglichen, um festzustellen, ob die momentane Senderate R zur verfügbaren Bandbreite B passt. 
+Wenn die Übertragungsrate R größer als die aktuell verfügbare Bandbreite ist, müssen die Pakete an einem entsprechenden Punkt der Verbindung zwischengepuffert werden, sodass die Verzögerung des i-ten Paketes größer wird, als die des Paketes zuvor. Wenn nun R > A ist, so kann dies an den Verzögerungswerten der Pakete gesehen werden, da diese mit steigender Anzahl der Pakete immer größer werden. Den umgekehrten Trend, wenn die Verzögerungszeiten kleiner werden, sieht man, wenn R < A ist. 
+\\
+Durch diese Beobachtungen kann der Empfänger dem Sender mitteilen, ob die aktuelle Senderate der Bandbreite entspricht, oder nicht.\cite{Pathload}
+
+\subsection{GPing}
+
+GPing benutzt ähnlich wie die Paket Pair Methode zwei Pakete, welche hin und zurück gesendet werden um eine Bandbreite zu bestimmen. Bei GPing wird allerdings ein kleines Paket P\textsubscript{klein} mit wenigen Bytes (< 100) und ein großes Paket P\textsubscript{groß} mit vielen Bytes (> 1000) versendet. Die RTT des kleinen Paketes RTT\textsubscript{klein} und die des großen Paketes RTT\textsubscript{groß} werden separat voneinander bestimmt um so die Bandbreite zu berechnen.
+Zur genaueren Messung werden mehrere Durchläufe n zur Bestimmung mehrerer RTTs gemacht. Die jeweils kleinste gemessene RTT pro Paket wird zur Berechnung der Bandbreite (B\textsubscript{GPing}) verwendet. Die zur Berechnung verwendeten RTTs werden zusätzlich noch durch zwei geteilt, da nicht die komplette Verzögerung, sondern nur die Einwegverzögerung zur Berechnung benötigt wird.
+
+\begin{align*}
+B\textsubscript{GPing} = \frac {2 * (P\textsubscript{groß} - P\textsubscript{klein})} {(min(RTT\textsubscript{groß}) -  min(RTT\textsubscript{klein}))}
+\end{align*}

@@ -1,0 +1,45 @@
+\newpage
+\section{Verwandte Arbeiten}
+
+Die Ermittlung der tatsächlich verfügbaren Bandbreite ist ein wichtiger und interessanter Indikator von Internetverbindungen. Aus diesem Grund existieren eine Reihe von Arbeiten über Techniken zur Ermittlung der tatsächlichen Bandbreite. Die im Folgenden beschriebenen Arbeiten basieren alle auf unterschiedlichen Verfahren oder Berechnungen zur Ermittlung der verfügbaren Bandbreite und geben so die Gesamtheit der unterschiedlichen Ansätze zur Bandbreitenbestimmung wieder.
+\\\\
+\textbf{Nettimer}
+\\
+Die von Kevin Lai und Mary Baker entwickelte Software Nettimer misst die verfügbare Bandbreite des Bottlenecks einer Verbindung anhand von gesendeten Paketpaaren und deren zeitlichen Differenzen beim Senden und Empfangen. Aufgrund der Tatsache, dass eine Messung schon mit zwei versendeten Paketpaaren gemacht werden kann, beschränkt sich diese Methode auf ein minimales Datenvolumen. \cite{Nettimer}
+\\
+\textbf{Pathload}
+\\
+Pathload ist eine von Manish Jain und Constantino Dovrolis entwickelte Software welche die Ende-zu-Ende verfügbare Bandbreite einer Verbindung ermittelt. Patload basiert auf der Versendung von Paketzügen. Diese Paketzüge bestehen aus mehreren einzelnen Paketen welche in bestimmten Abständen verschickt werden. Anhand der Anpassung der zeitlichen Abstände kann die maximale Bandbreite ermittelt werden. \cite{Pathload}
+\\
+\textbf{PathChirp}
+\\
+PathChirp basiert ähnliche wie Pathload ebenfalls auf der Versendung von Paketzügen. Anders als bei Pathload werden die Pakete des Paketzuges nicht mit konstantem Abstand versendet, sondern dieser Abstand wird mit fortlaufender Paketanzahl immer weiter verringert. Die Verringerung wird solange fortgesetzt, bis die maximale Bandbreite erreicht wird. Im Gegensatz zu Pathload hat PathChirp ein erheblich verringertes Datenvolumen. \cite{PathChirp}
+\\
+\textbf{STAB}
+\\
+STAB wurde unter anderem von Vinay J. Ribeiro entwickelt, welcher auch an PathChirp mitgewirkt hat. STAB ist eine Kombination aus Paketzügen und der Versendung von kleinen und großen Paketen. Die Versendung von kleinen und großen Paketen geschieht aus dem Grund, dass kleine Pakete bei Annäherung an die maximal verfügbare Bandbreite noch beim Empfänger ankommen, wohingegen große Pakete verworfen werden. Aus den Ankunftszeiten der kleinen Pakete kann die Bandbreite ermittelt werden. \cite{STAB}
+\\
+\textbf{GPing}
+\\
+GPing wurde von Mingyang Zhong, Peizhao Hu und Jadwiga Indulska speziell zur Messung der Bandbreite in mobilen Netzen entwickelt, welches Limitierungen anderer Messmethoden minimieren soll. GPing basiert auf der Versendung von ICMP-Nachrichten und den daraus resultierenden Sende- und Ankunftszeiten dieser Nachrichten. \cite{GPing}
+\\
+\textbf{Spruce}
+\\
+Spruce ist ein von Jacob Strauss und Dina Katabi entwickeltes Programm welches ähnlich wie Nettimer auf der Versendung von Paketpaaren und deren Ankunftszeiten basiert. Darüber hinaus benötigt Spruce zur Berechnung der Bandbreite Informationen über die maximale Kapazität einer Verbindung. \cite{Spruce}
+\\
+\textbf{JPerf}
+\\
+JPerf ist ein in Java entwickeltes Programm mit grafischer Benutzeroberfläche, welches auf dem Kommandzeilenprogramm iperf basiert. JPerf misst die Bandbreite anhand des Datendurchsatzes. Aus diesem Grund benötigt JPerf immer eine Client-Server-Architektur. Zwischen Client und Server werden Daten ausgetauscht und der Datendurchsatz wird anhand der Daten und der Dauer der Übertragung dieser Daten gemessen. \cite{JPerf}
+\\
+Mit Ausnahme von GPing welches Ping-Nachrichten auf Basis von ICMP-Nachrichten versendet, benötigen alle anderen Verfahren eine Client-Server-Architektur zur Messung von Paketzeiten. Die Messverfahren auf denen diese Programme basieren werden in dieser Arbeit teilweise verwendet.
+Der Unterschied ist, dass diese Verfahren speziell in mobilen Netzwerken eingesetzt werden sollen und es daher erforderlich ist, dass sie in einer App umgesetzt werden. GPing ist die einzige beschriebene Methode, die sich ebenfalls mit der Thematik der Bandbreitenbestimmung in mobilen Netzen befasst.
+Unterschiedliche Verfahren werden implementiert und werden daraufhin untereinander verglichen und bewertet.
+\\
+Neben unterschiedlichen Verfahren zur Ermittlung der Bandbreite existieren darüber hinaus auch eine Reihe von Apps die Bandbreitenmessungen durchführen. Als Beispiele sind hier Apps wie Speedtest.net\footnote[1]{\url{https://play.google.com/store/apps/details?id=org.zwanoo.android.speedtest&hl=de}} oder DSL Speedtest\footnote[2]{\url{https://play.google.com/store/apps/details?id=uk.co.broadbandspeedchecker}} zu nennen. Die Messungen dieser Apps zur Ermittlung der Download- und Upload-Bandbreite basieren allerdings auf dem tatsächlich erzielten Datendurchsatz durch das Verschicken von größeren Datenmengen. Dieses Datenvolumen soll durch die oben erwähnten Methoden deutlich reduziert werden, sodass auch mit deutlich reduziertem Datenaustausch möglichst genaue Ergebnisse erzielt werden.
+\\\\
+Ein weiteres Thema dieser Arbeit ist neben der Ermittlung der Bandbreite auch die Sammlung von Gerätespezifischen Daten. Die Ermittlung der Bandbreite ist ohne zum Beispiel Orts- oder Zeitinformationen eher uninteressant. Im Bereich der Geräte- oder Personenbezogenen Datensammlung existieren vor allem im mobilen Feld sehr viele Programme. Sensor Box for Android\footnote[3]{\url{http://downloadandroid.info/}} und AndroSensor\footnote[4]{\url{http://www.fivasim.com/androsensor.html}} sind zwei Beispiele für Apps welche Sensordaten  erheben. Die zurückgegebenen Werte der unterschiedlichen Sensoren eines Gerätes wie zum Beispiel Lichtsensor oder auch Gyroskop können eingesehen und der zeitliche Verlauf der Werte betrachtet werden.
+\\
+Neben Apps zur Erhebung von Sensordaten existieren auch eine Reihe von Arbeiten zum Thema Datenerhebung und Datensammlung. In einem Versuch der UC Berkeley wurden GPS-Daten von Handys dazu verwendet, um Verkehrsdaten zu sammeln. Mit Hilfe der Daten konnten Reisezeiten und Geschwindigkeiten anhand einer bestimmten Route ermittelt werden. \cite{UCBTraffic}
+In dieser Arbeit werden neben anderen Daten ebenfalls GPS-Daten erhoben. Die daraus resultierenden Ergebnisse können bei der Bestimmung von Bandbreiten an bestimmten Orten nützlich sein.
+\\
+Ein weiterer Artikel von Katie Shilton beschäftigt sich mit der Frage der Privatsphäre bei der Sammlung von Daten einzelner Personen. In diesem Zusammenhang wird auch der Frage nachgegangen wie Daten generell geschützt werden können und welche Möglichkeiten Anwendern von Entwicklerseite zum Schutz ihrer Daten eingeräumt werden müssen. \cite{Privacy} Die in dieser Arbeit entwickelte Software beschäftigt sich ebenfalls mit dem Thema des Datenschutzes, da neben der eigentlichen Bandbreitenmessung auch Informationen zu Ort und Zeit gesammelt werden.

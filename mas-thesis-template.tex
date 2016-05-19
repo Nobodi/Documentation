@@ -1,0 +1,76 @@
+%!TEX program = lualatex
+\documentclass[masterarbeit,grey,german]{mas-thesis-sections}				% Available options:
+															% masterarbeit, bachelorarbeit, dissertation,
+															% masterprojekt, bachelorprojekt, seminararbeit,
+															% fallstudie, grey (fÃ¼r Graustufen), english
+
+
+\usepackage{amsmath} % Für Mathematische Formeln
+
+\author{Michael Jokic}
+\title{Analyse von Bandbreitenmessmethoden in mobilen Netzen}
+\supervisor{Dr. Florian Metzger}	% ~ for nicer spaces
+\reviewerA{Univ. Prof. Dr. Tobias Hoßfeld}
+\reviewerB{Univ. Prof. Dr. Jos\'{e} Marr\'{o}n}
+\degreecourse{Angewandte Informatik - Systems Engineering}
+\location{Essen}
+%\linespread{1.25} % Line spread (default is 1.25)
+\handoverdate{19.09.2016}
+
+%%%%%%%%%%%%%% 
+%TODO:
+
+%\usepackage{array}
+
+
+%% load bibs
+\addbibresource{bibliography/bibliography.bib}
+%\addbibresource{bibliography/more-bibliography.bib}
+
+%\input{components/info}
+
+%\DeclareBibliographyCategory{ownpub}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle			% Title Page
+
+\pagenumbering{Roman}
+\tableofcontents		% Table of Contents
+
+\newpage
+
+\listofillustrations	% List of Figures and List of Tables
+
+
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter{Introduction}	% Remove if not dissertation or masterarbeit
+
+\section{Abstract}
+
+This document is a short example of how to use this template to write your own thesis. It gives a brief summary of the most important aspects and options that define this template.
+
+\newpage
+
+\input{chapters/Einleitung}
+\input{chapters/Verwandte-Arbeiten}
+\input{chapters/Messmethoden}
+\input{chapters/Umsetzung}
+\input{chapters/Analyse}
+\input{chapters/Ausblick}
+\input{chapters/Fazit}
+
+\newpage
+
+\printbibliography[heading=bibnumbered]
+
+\newpage
+
+\makelicensepageCCBYSA
+
+\end{document}
