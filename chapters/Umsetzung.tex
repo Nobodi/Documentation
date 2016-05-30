@@ -1,10 +1,110 @@
-\newpage
-\section{Umsetzung}
+\chapter{Umsetzung}
 
-\subsection{Anforderungen}
+In diesem Kapitel wird die Umsetzung der Software, sprich der App betrachtet. Die weiteren Abschnitte gliedern sich nach Anforderungen, welche an die App gestellt werden, und der daraus resultierenden Implementierung dieser Anforderungen. Desweiteren wird auf Probleme bei der Umsetzung näher eingegangen.
 
-\subsubsection{Messmethoden}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-\subsubsection{App}
+\section{Anforderungen}
 
-\subsection{Implementierung}
+Das Ziel ist es, eine Software in App-Form zu entwickeln, welche Bandbreitenmessungen unter zu Hilfenahme von unterschiedlichen Messmethoden durchführt. Zu diesem Zweck sollte die Software in der Lage sein automatisiert Messungen in bestimmten zeitlichen Abständen vorzunehmen. Darüber hinaus sollen die Messergebnisse permanent auf einem Server abgespeichert werden. Zur besseren Transparenz sollen die erfassten Daten des Gerätes dem Benutzer sichtbar gemacht werden.
+\\\\
+Für die in der App verwendeten Messmethoden gelten separate Anforderungen, die im Folgenden getrennt von den Anforderungen der App beschrieben werden.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Messmethoden}
+
+Da die Messmethoden im mobilen Bereich Verwendung finden, müssen diese spezielle Anforderungen erfüllen. Eine der wichtigsten ist die des verwendeten Datenvolumen. Da Datenvolumen im mobilen Bereich für die meisten Geräte beziehungsweise Nutzer begrenzt ist, sollten die Messmethoden möglichst wenig Daten pro Messung benötigen. Desweiteren ist die Präzision ein wichtiges Kriterium. Pro Messung sollte jedes Verfahren ein möglichst präzises Ergebnis ermitteln. Die Präzision leidet meistens unter dem verringerten Datenvolumen. Deswegen ist es wichtig, dass zwischen diesen beiden Anforderungen der passende Kompromiss gefunden wird. Desweiteren ist die Zeitdauer der Messung entscheidend. Diese sollte auf keinen Fall zu lang sein, da sich mobile Geräte mitunter schnell bewegen können. 
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{App}
+
+Die Anforderungen an die App beziehen sich auf der einen Seite auf die Funktionen, die in Verbindung mit den Bandbreitenmessungen stehen. Auf der anderen Seite sind es die Einstellungsmöglichkeiten, die dem Benutzer zur Verfügung gestellt werden. Darüber hinaus gibt es Anforderungen die sich auf den Umgang mit Nutzerdaten beziehen.
+\\\\
+Bei den Anforderungen zur Bandbreitenmessung ist wichtig, dass diese automatisiert ausgeführt werden. Das bedeutet, dass Messvorgänge periodisch  gestartet werden, ohne das der Benutzer aktiv eine Messung ausführen muss. Darüber hinaus ist die manuelle Ausführung eines Messvorgangs aber ebenfalls möglich. Desweiteren sollen die gemessenen Daten an einen Server geschickt werden, um diese auswerten zu können. Das Verschicken der  Daten zum Server sollte nicht nach jedem Messvorgang erfolgen. Die Daten sollen zuerst auf dem Gerät zwischengespeichert werden und innerhalb einer bestimmten Zeitspanne (ein Mal pro Tag) versendet werden. Um einen Überblick über ausgeführte Messvorgänge zu bekommen, werden diese in Listenform mit allen relevanten erfassten Daten angezeigt.
+\\
+Über die Messdaten zur Bandbreite hinaus, werden weitere Parameter erfasst, die zur Auswertung der Daten nützlich sind. Diese Daten sind in Tabelle \ref{t-collected-userdata} kurz aufgelistet.
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|c|p{11cm}|}
+		\hline
+			\textbf{Parameter} & \textbf{Bedeutung} \\
+		\hline
+			Zeitstempel & Datum und Zeit, an der die Messung ausgeführt wurde \\
+		\hline
+			Wifi & Angabe, ob die Messung über ein WLAN erfolgte \\
+		\hline
+			Mobile & Angabe, ob die Messung über ein mobiles Netz erfolgte \\
+		\hline
+			Provider & Verwendeter Telekommunikationsanbieter \\
+		\hline
+			Country Code & Ländercode zur Identifizierung des Landes \\
+		\hline
+			MCC & Mobile Country Code - Zur geografischen Zuordnung des Mobilfunknetzes \\
+		\hline
+			MNC & Mobile Network Code - Zur Identifizierung des Funknetzanbieters \\
+		\hline
+			LAC & Location Area Code - Aufenthaltsbereich eines Mobiltelefons innerhalb eines Funknetzes \\
+		\hline
+			CID & Cell Identification - Eine eindeutige Kennzahl für eine Sendestation \\
+		\hline
+			GPS & Vom Endgerät ermittelte GPS-Koordinaten \\
+		\hline
+		\end{tabular}
+	\caption{Erhobene Nutzerdaten}
+	\label{t-collected-userdata}
+\end{table}
+
+Bei diesen Daten handelt es sich um sensible Nutzerdaten. Um die Privatsphäre des Nutzers zu schützen, werden diesem Einstellungen zur Verschleierung seiner Daten zur Verfügung gestellt. Diese beziehen sich zum einen auf den erfassten Ort und zum anderen auf die erfasste Zeit. Der Nutzer kann einstellen, dass nicht direkt die GPS-Koordinaten des Gerätes, sondern die des Zugangspunktes erfasst werden. Bei der Zeit kann eingestellt werden, dass diese immer auf eine volle Stunde auf- beziehungsweise abgerundet wird. Um das Mitschneiden der Daten bei der Übertragung vom Gerät zum Server zu verhindern werden diese zusätzlich verschlüsselt übertragen.
+\\
+Darüber hinaus hat der Nutzer noch weitere Einstellungsmöglichkeiten, um das verwendete Datenvolumen bei den Messungen zu begrenzen. Zum einen kann eingestellt werden, dass Messungen nur im WLAN ausgeführt werden, um das mobile Datenvolumen nicht zu belasten. Zum anderen kann die Anzahl der Messdurchläufe der Messmethoden pro Messungvorgang eingestellt werden.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Implementierung}
+
+Die Implementierung der Anforderungen für die App kann in drei Abschnitte unterteilt werden, da diese größtenteils unabhängig voneinander umgesetzt wurden. Die drei Abschnitte befassen sich zum einen mit den Messmethoden, die unabhängig von der späteren Verwendung in einer App implementiert wurden und zum anderen mit der eigentlichen Umsetzung der App. Der dritte Abschnitt befasst sich mit der Umsetzung eines Sniffers, sprich eines Programms zur Paketanalyse der Netzwerkpakete.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Messmethoden}
+
+...
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{\gls{Sniffer}}
+
+Der Sniffer ist zur Erfassung von Datenpaketen des Netzwerkverkehrs. Die Erfassung ist wichtig, da anhand dieser Pakete die genauen Sende- und Empfangszeiten der Pakete ermittelt und daraus die Bandbreiten exakter berechnet werden können.
+\\
+Aufgrund der Tatsache, dass es in Java auf Socket-Ebene keine Pakete, sondern nur Datenströme gibt, musste der Sniffer in C umgesetzt werden.
+Der Sniffer arbeit auf Raw-Socket-Ebene. Dies bedeutet, dass Pakete direkt gesendet oder empfangen werden können, ohne Formatieung von darüber liegenden Transportprotokollen. Der Sniffer ist so implementiert, dass er auf unterschiedliche Protokollarten (TCP, UDP, ICMP, ...) reagieren kann. 
+Allerdings werden nur bei TCP-basierten Paketen Ausgaben erzeugt. Diese Ausgaben beschränken sich auf die Quell- und Zieladresse sowie die Größe und den Zeitstempel des Paketes. Als Einschränkung der Ausgaben kann eine IP-Adresse bei Start des Sniffers übergeben werden, sodass nur Paketinformationen zu Paketen ausgegeben werden, bei denen die Quell- oder Zieladresse identisch mit der übergebenen Adresse ist. Eine weitere Einschränkung ist die Paketgröße. Pakete die kleiner als 100 Byte sind, werden nicht ausgegeben. Dies hat den Grund, dass Paketproben der App immer größer als 100 Byte sind und somit für die Berechnung unwichtige Kontrollnachrichten wie Acknowledgements direkt gefiltert werden.
+\\
+Einbindung mittels JNI/NDK ...
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{App}
+
+- Aufteilung der App (Sichten)
+\\
+- Funktionsumsetzung
+\\
+Android API
+\\
+Bild der App/Schematische Darstellung Messvorgang
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Probleme}
+
+Die Umsetzung der Idee Bandbreitenmessmethoden auf mobilen Endgeräten zu verwenden, brachte mehrere Probleme hervor, die in diesem Kapitel näher betrachtet werden. 
+\\
+Das Hauptproblem bei der Umsetzung liegt hauptsächlich bei der verwendeten Programmiersprache Java. Java ist eine höhere Programmiersprache. Aus diesem Grund können hardwarenahe Funktionen nicht direkt oder gar nicht ausgeführt werden. Dies macht sich bei Verwendung von Sockets direkt bemerkbar. Bei Java basiert die Versendung von Daten über Sockets auf Datenströmen. Die tatsächliche Datenversendung im Rechnernetz erfolgt allerdings paketvermittelt, sprich Daten werden in einzelnen Paketen versendet. Auf dieser Grundlage ist es in Java nicht möglich einzelne Pakete zu verschicken, oder Ankunftszeiten einzelner Pakete direkt aus Java heraus zu ermitteln.
+\\
+Als Problemlösung bietet sich die Verwendung von Drittanbieterbibliotheken an, welche diese Funktionen in Java bereitstellen (JnetPcap, RawSocket). Die Funktionen die in Java zur Verfügung stehen, werden am Ende auf hardware-nähere Programmiersprachen wie C abgebildet. Das Problem bei diesen Bibliotheken ist allerdings die Verwendung unter Android. Das Problem ergibt sich daraus, dass Paketinformationen nur über Raw-Sockets bezogen werden können. Unter Android können nur Systemapps die Erlaubnis beziehen auf Raw-Sockets zuzugreifen. Aus diesem Grund können die Bibliotheken zwar unter Android verwendet werden, die Ausführung der Funktionen ist allerdings nicht möglich.
+\\
+Die Ermittlung der Ankunftszeiten kann in Java über die Messung der Systemzeit vor Datenempfang erfasst werden. Diese Zeit kann allerdings mehr oder weniger stark von der tatsächlichen Ankunftszeit der Pakete an der Netzwerkschnittstelle abweichen, da zwischen dem Empfang an der Schnittstelle und der ermittelten Systemzeit in Java mehrere Transportschichten liegen, die das Paket noch durchlaufen muss.
