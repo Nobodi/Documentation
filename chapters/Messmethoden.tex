@@ -1,24 +1,36 @@
-\newpage
-
 % Erwähnen, wie viel Datenvolumen jede Methode benötigt
 
-\section{Messmethoden}
+% GPing als Packet Tailgating Methode als Variante von Packet Pair mit großem und kleinem Paket
+
+\chapter{Messmethoden}
 
 Es existieren unterschiedliche Methoden um die Bandbreite zu bestimmen. Ein Verfahren zur Bestimmung der Bandbreite ist der Download. Durch den Download einer entsprechend großen Datei kann der tatsächlich erreichte Datendurchsatz ermittelt werden. Diese Methode ist die genaueste, eignet sich allerdings nicht so gut, da zu viel Daten anfallen und es unter Umständen sehr lange dauern kann. Aus diesem Grunde werden im Folgenden Methoden vorgestellt, welche diese Probleme umgehen, und trotzdem die Bandbreite ermitteln können.
 \\\\
 Grob können diese Methoden in zwei Klassen eingeteilt werden. Die erste Klasse bestimmt die Bandbreite durch Verzögerungszeiten einzelner versendeter Pakete, die durch weiteren Datenverkehr verursacht werden. Diese Klasse wird als Cross Traffic Estimation bezeichnet. Die zweite Klasse bestimmt Bandbreiten mittels Überlastung (Congestion) der Verbindung. Dabei wird die Bandbreite der maximalen Bandbreite bis zur Überlastung des Kanals schrittweise durch Versenden von Paketen angepasst. Diese Klasse wird als Self Induced Congestion bezeichnet.
 
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Cross Traffic Estimation}
+
+Cross Traffic schickt Proben einzelner Pakete ins Netz und misst durch Verzögerungen der Pakete die Bandbreite.
+Cross Traffic interagiert mit weiterem Datenverkehr im Netz, der an einzelnen Routern anfällt. Durch diesen Vorgang werden die versendeten Proben an Routern zwischengespeichert und es kommt zu Verzögerungen.
+In dieser Klasse gibt es zwei Ansätze. Versendung eines einzelnen Paketes. Versenden von mehreren Paketen. Bei zwei Paketen gibt es noch eine Variante namens Packettailgating, bei der nicht zwei gleichgroße Pakete, sondern ein kleines und ein großes Paket versendet werden.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 \subsection{Paketumlaufzeit (Round Trip Time)}
 
-Diese Methode entspricht in etwa dem Download, allerdings kann diese Methode auch mit kleineren Datenmengen schon ziemlich genau den Datendurchsatz bestimmen. Unter der Round Trip Time (RTT) wird die Zeit verstanden, die ein Paket benötigt, um von einer Quelle zum Ziel und wieder zurück zu kommen. Dieses Konzept wird auf den Download einer kleineren Datenmenge angewendet. Zur Berechnung der Bandbreite wird eine kleine Datenmenge (ca. 0,5 MB) geladen und die Zeit zwischen Anfrage und Empfang der Datei gemessen. Die Bandbreite (B\textsubscript{RTT}) berechnet sich indem die Paketgröße oder bezogene Datenmenge (P) durch die Paketumlaufzeit (RTT) geteilt wird.
+Diese Methode entspricht in etwa dem Download, allerdings kann sie auch mit kleineren Datenmengen schon ziemlich genau den Datendurchsatz bestimmen. Unter der Round Trip Time (RTT) wird die Zeit verstanden, die ein Paket benötigt, um von einer Quelle zum Ziel und wieder zurück zu kommen. Dieses Konzept wird auf den Download einer kleineren Datenmenge angewendet. Zur Berechnung der Bandbreite wird eine kleine Datenmenge (ca. 0,5 MB) geladen und die Zeit zwischen Anfrage und Empfang der Datei gemessen. Die Bandbreite (B\textsubscript{RTT}) berechnet sich indem die Paketgröße oder bezogene Datenmenge (P) durch die Paketumlaufzeit (RTT) geteilt wird.
 
 \begin{align*}
 B\textsubscript{RTT} =\frac { P} {RTT}
 \end{align*}
 
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 \subsection{Packet Pair (PP)}
 
-Die Paket Pair Methode gehört zur Klasse der Cross Traffic Estimation Methoden. Bei dieser Methode werden zwei Pakete gleicher Größe von einer Quelle zum Ziel und wieder zurück gesendet. Die beim Absenden und Empfangen gemessenen Ankunftszeiten der Pakete dienen zur Berechnung der Zeitunterschiede $\Delta$t\textsubscript{out} beim Senden und $\Delta$t\textsubscript{in} beim Empfangen. 
+Bei der Paket Pair Methode werden zwei Pakete gleicher Größe von einer Quelle zum Ziel und wieder zurück gesendet. Die beim Absenden und Empfangen gemessenen Ankunftszeiten der Pakete dienen zur Berechnung der Zeitunterschiede $\Delta$t\textsubscript{out} beim Senden und $\Delta$t\textsubscript{in} beim Empfangen. 
 
 \begin{figure}[htbp]
 	\centering
@@ -33,19 +45,7 @@ In Abbildung \ref{pp} ist der Ablauf dieser Methode schematisch dargestellt. Die
 B\textsubscript{PP} = \frac { P}  {|(\Delta\textsubscript{in} - \Delta\textsubscript{out})|}
 \end{align*}
 
-\subsection{Packet Train (PT)}
-
-Die Paket Train Methode gehört zur Klasse der Self Induced Congestion Methoden. Sie basiert auf dem Versenden von Paketzügen. Dabei besteht ein Paketzug aus mehreren Paketen der Anzahl n, welche in gleichem Abstand $\Delta$t voneinander versendet werden. Die Größe der Pakete ist P Bytes und ist für alle Pakete gleich. Die Übertragungszeit eines Paketes des Paketzuges beträgt T. Der Abstand $\Delta$t zwischen den Paketen wird vom Sender an die gegebene Situation angepasst.
-Aus diesen Werten kann der Sender eine Übertragungsrate R berechnen, mit der die Pakete versendet werden.
- 
-\begin{align*}
-R\textsubscript{PT} = \frac {P} {T + \Delta t}
-\end{align*}
-
-Vor dem Versenden der Pakete wird jedes mit einem Zeitstempel t\textsubscript{i} versehen. Der Empfänger berechnet nach Empfang der Pakete mit Hilfe der Ankunftszeit a\textsubscript{i} des jeweiligen Paketes die relative Verzögerung D\textsubscript{i} = a\textsubscript{i} - t\textsubscript{i}. Wenn alle Verzögerungswerte der Pakete berechnet wurden, werden diese miteinander verglichen, um festzustellen, ob die momentane Senderate R zur verfügbaren Bandbreite B passt. 
-Wenn die Übertragungsrate R größer als die aktuell verfügbare Bandbreite ist, müssen die Pakete an einem entsprechenden Punkt der Verbindung zwischengepuffert werden, sodass die Verzögerung des i-ten Paketes größer wird, als die des Paketes zuvor. Wenn nun R > A ist, so kann dies an den Verzögerungswerten der Pakete gesehen werden, da diese mit steigender Anzahl der Pakete immer größer werden. Den umgekehrten Trend, wenn die Verzögerungszeiten kleiner werden, sieht man, wenn R < A ist. 
-\\
-Durch diese Beobachtungen kann der Empfänger dem Sender mitteilen, ob die aktuelle Senderate der Bandbreite entspricht, oder nicht.\cite{Pathload}
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{GPing}
 
@@ -55,3 +55,76 @@ Zur genaueren Messung werden mehrere Durchläufe n zur Bestimmung mehrerer RTTs g
 \begin{align*}
 B\textsubscript{GPing} = \frac {2 * (P\textsubscript{groß} - P\textsubscript{klein})} {(min(RTT\textsubscript{groß}) -  min(RTT\textsubscript{klein}))}
 \end{align*}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Self Induced Congestion}
+
+Bei dieser Klasse wird die Bandbreite durch eine eigens erzeugte Überlastung des Netzwerkes berechnet. Dies wird erreicht, indem viele Pakete in kurzen Abständen hintereinander versendet werden, um das Netzwerk mit Paketen zu fluten. Die Last die dabei erzeugt wird erreicht somit nach Anpassung der Sendefrequenz irgendwann den Punkt, andem das Netz seine maximale Bandbreite erreicht.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Packet Train (PT)}
+
+Die Paket Train Methode basiert auf dem Versenden von Paketzügen. Dabei besteht ein Paketzug aus mehreren Paketen der Anzahl n, welche in gleichem Abstand $\Delta$t voneinander versendet werden. Die Größe der Pakete ist P Bytes und ist für alle Pakete gleich. Die Übertragungszeit eines Paketes des Paketzuges beträgt T. Der Abstand $\Delta$t zwischen den Paketen wird vom Sender an die gegebene Situation angepasst.
+Aus diesen Werten kann der Sender eine Übertragungsrate R berechnen, mit der die Pakete versendet werden.
+
+\begin{align*}
+R\textsubscript{PT} = \frac {P} {T + \Delta t}
+\end{align*}
+
+Vor dem Versenden der Pakete wird jedes mit einem Zeitstempel t\textsubscript{i} versehen. Der Empfänger berechnet nach Empfang der Pakete mit Hilfe der Ankunftszeit a\textsubscript{i} des jeweiligen Paketes die relative Verzögerung D\textsubscript{i} = a\textsubscript{i} - t\textsubscript{i}. Wenn alle Verzögerungswerte der Pakete berechnet wurden, werden diese miteinander verglichen, um festzustellen, ob die momentane Senderate R zur verfügbaren Bandbreite B passt. 
+Wenn die Übertragungsrate R größer als die aktuell verfügbare Bandbreite ist, müssen die Pakete an einem entsprechenden Punkt der Verbindung zwischengepuffert werden, sodass die Verzögerung des i-ten Paketes größer wird, als die des Paketes zuvor. Wenn nun R > A ist, so kann dies an den Verzögerungswerten der Pakete gesehen werden, da diese mit steigender Anzahl der Pakete immer größer werden. Den umgekehrten Trend, wenn die Verzögerungszeiten kleiner werden, sieht man, wenn R < A ist. 
+\\
+Durch diese Beobachtungen kann der Empfänger dem Sender mitteilen, ob die aktuelle Senderate der Bandbreite entspricht, oder nicht.\cite{Pathload}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Vergleich}
+
+Die unterschiedlichen Messverfahren werden anhand der Daten die zeitgleich durch die Nutzung des Downloads berechnet wurden, verglichen. Da die Bandbreite durch den Download am exaktesten bestimmt werden kann, werden diese Daten als Richtlinie zum Vergleich genommen.
+\\
+Der Vergleich stützt sich im Detail auf zwei wichtige Kenngrößen. Zum einen ist dies das verwendete Datenvolumen pro Messung und zum anderen die Präzision der Messung. Weitere wichtige Faktoren sind die Messdauer pro Messung, sowie die Stabilität. Stabilität bezieht sich auf die Abweichungen der unterschiedlichen Messungen. Sind diese gering ist das Verfahren stabil, sind diese zwischen einzelnen Messungen in geringen Zeitabständen groß ist das Verfahren eher instabil. Desweiteren wird auf Probleme bei den einzelnen Messmethoden eingegangen. 
+\\\\
+\textbf{RTT}
+\\
+Da RTT auf dem gleichen Prinzip wie der Download basiert, ist die Präzision ebenfalls ziemlich gut, bei signifikant kleinerem Datenverbrauch. Da pro Messdurchgang eine Datei mit fester Größe runtergeladen wird, kann der Datenverbrauch genau festgestellt werden. Um noch möglichst präzise Bandbreiten du berechnen sollte die Datei nicht kleiner als 250 KB sein. Besser wäre noch 500 KB. Das Verfahren ist darüber hinaus relativ stabil und benötigt gegenüber dem Download viel weniger Zeit.
+\\\\
+\textbf{PP}
+\\
+PP verschickt pro Messung nur zwei Pakete hat somit sehr wenig Datenverbrauch und die Messung kann schnell ausgeführt werden. Dadurch ist das Verfahren allerdings nicht sehr stabil und es müssen mehrere Messdurchgänge durchgeführt werden, um aussagekräftige Ergebnisse zu bekommen. In kurzen Zeitabständen durchgeführte Messungen können daher sehr voneinander abweichen und somit ist die Präzision dieses Verfahrens mittelmäßig.
+\\\\
+\textbf{GPing}
+\\
+GPing verschickt wie PP ebenfalls nur zwei Pakete und hat somit ebenfalls wenig Datenverbrauch und eine geringe Messdauer. Das Verfahren liefert im Gegensatz zu PP allerdings wesentlich stabilere Werte, die bei aufeinander folgenden Messungen nur sehr wenig voneinander abweichen. Allerdings ist die Präzision dieser Methode sehr gering, da die Bandbreiten bei den durchgeführten Messungen immer 3 bis 4 Mal geringer waren, als die Vergleichswerte. 
+\\\\
+\textbf{PT}
+\\
+Da PT sich an die maximale Bandbreite durch verschicken von Paketzügen heran tastet, schwankt der Datenverbrauch bei dieser Methode erheblich. Allerdings liegt dieser im Vergleich zum Download immer noch signifikant niedriger. Die Messdauer ist im Vergleich zum Download und RTT kürzer, aber erheblich größer im Vergleich zu PP und GPing.
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|c|c|c|c|c|}
+		\hline
+			\textbf{Messverfahren} & \textbf{Präzision} & \textbf{Datenvolumen} & \textbf{Messdauer} & \textbf{Stabilität} \\
+		\hline
+			Download & Sehr hoch & 10 - 20 MB & Lang & Sehr hoch \\
+		\hline
+			RTT & Hoch & 250 KB (500 KB) & Mittel & Sehr hoch \\
+		\hline
+			PP & Mittel & 0,5 - 6 KB & Kurz & Gering \\
+		\hline
+			GPing & Gering & ca. 5 KB & Kurz & Sehr hoch \\
+		\hline
+			PT & Mittel & 100 - 500 KB & Lang & Mittel \\
+		\hline
+		\end{tabular}
+	\caption{Vergleich der Messmethoden}
+	\label{t1-Comparison-Measurements}
+\end{table}
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Probleme}
+
+...
