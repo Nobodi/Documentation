@@ -11,7 +11,8 @@
 % load base class
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\LoadClass[openright,titlepage,numbers=noenddot,headinclude,footinclude=true,cleardoublepage=empty,BCOR=5mm,paper=A4,fontsize=12pt,twoside]{scrreprt}[2015/01/01]
+% \LoadClass[openright,titlepage,numbers=noenddot,headinclude,footinclude=true,cleardoublepage=empty,BCOR=5mm,paper=A4,fontsize=12pt,twoside]{scrreprt}[2015/01/01]
+\LoadClass[titlepage,numbers=noenddot,headinclude,footinclude=true,cleardoublepage=empty,BCOR=5mm,paper=A4,fontsize=12pt,twoside]{scrreprt}[2015/01/01] %new Version
 
 \ProvidesClass{mas-thesis-chapters}[2015/08/28 Uni-DUE MAS thesis class]
 
@@ -22,10 +23,10 @@
 % LaTeX parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\RequirePackage[acronym, nomain, style=tree, toc, section=chapter, nogroupskip=true]{glossaries}
+\RequirePackage[acronym, style=tree, toc, section=chapter, nogroupskip=true]{glossaries}
 
 %% load and typeset glossaries
-\makeglossaries
+% \makeglossaries
 \renewcommand{\glsseeitemformat}[1]{\textsc{\glsentryname{#1}}}
 %\loadglsentries{components/definitions}
 %\loadglsentries{components/acronyms}
@@ -57,32 +58,26 @@
 		\let\cleardoublepage\relax
 		\ifgerman
 			\chapter*{Abbildungen}%
-			\phantomsection
-			\addcontentsline{toc}{section}{Abbildungen}%
-			\@starttoc{lof}%
 		\else
 			\chapter*{Figures}
-			\phantomsection
-			\addcontentsline{toc}{section}{Figures}%
-			\@starttoc{lof}%
 		\fi
+		%\phantomsection
+		\addcontentsline{toc}{section}{Figures}%
+		\@starttoc{lof}%
 		\bigskip
 		\ifgerman
 			\chapter*{Tabellen}%
-			\phantomsection
-			\addcontentsline{toc}{section}{Tabellen}%
-			\@starttoc{lot}
 		\else
 			\chapter*{Tables}
-			\phantomsection
-			\addcontentsline{toc}{section}{Tables}%
-			\@starttoc{lot}
 		\fi
+		%\phantomsection
+		\addcontentsline{toc}{section}{Tables}%
+		\@starttoc{lot}
     \endgroup}
 
 \titleformat{\chapter}[display]
-	{\relax}{\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{halfgray}\fontsize{2.7cm}{1em}\selectfont\thechapter}}{0pt}
-	{\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]
+	{\relax}{\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{halfgray}\fontsize{1.5cm}{1em}\selectfont\thechapter}}{0pt}
+	{\Large\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]
 
 % headlines
 \clearscrheadings

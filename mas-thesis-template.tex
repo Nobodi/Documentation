@@ -1,11 +1,28 @@
-%!TEX program = lualatex
-\documentclass[masterarbeit,grey,german]{mas-thesis-sections}				% Available options:
+%!TEX program = pdflatex
+\documentclass[masterarbeit,grey,german]{mas-thesis-chapters}				% Available options:
 															% masterarbeit, bachelorarbeit, dissertation,
 															% masterprojekt, bachelorprojekt, seminararbeit,
 															% fallstudie, grey (fÃ¼r Graustufen), english
 
 
-\usepackage{amsmath} % Für Mathematische Formeln
+\usepackage{amsmath} % Mathematic Formulas
+ \usepackage{acronym} % Acronyms
+
+
+\usepackage{lmodern} % Latin Modern
+ 
+% Create own Symbol Index
+\newglossary[slg]{symbolslist}{syi}{syg}{Symbolverzeichnis}
+ 
+% Disable Point at the end of Descriptions
+\renewcommand*{\glspostdescription}{}
+ 
+%Enable Glossar Commands
+\makeglossaries
+ 
+% Load Glossary File
+\loadglsentries{chapters/Glossar}
+ 
 
 \author{Michael Jokic}
 \title{Analyse von Bandbreitenmessmethoden in mobilen Netzen}
@@ -68,6 +85,17 @@ This document is a short example of how to use this template to write your own t
 \newpage
 
 \printbibliography[heading=bibnumbered]
+
+\glsaddall % print all Entries in Glossary even those without reference
+% Print Glossary
+\printglossary[style=altlist,title=Glossar]
+ 
+% Print Acronyms
+\deftranslation[to=German]{Acronyms}{Abkürzungsverzeichnis}
+\printglossary[type=\acronymtype,style=long,title=Abkürzungsverzeichnis,toctitle=Abkürzungsverzeichnis]
+ 
+% Print Symbols
+\printglossary[type=symbolslist,style=long]
 
 \newpage
 
