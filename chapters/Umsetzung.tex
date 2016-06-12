@@ -66,6 +66,8 @@ Darüber hinaus hat der Nutzer noch weitere Einstellungsmöglichkeiten, um das ver
 \section{Implementierung}
 
 Die Implementierung der Anforderungen für die App kann in drei Abschnitte unterteilt werden, da diese größtenteils unabhängig voneinander umgesetzt wurden. Die drei Abschnitte befassen sich zum einen mit den Messmethoden, die unabhängig von der späteren Verwendung in einer App implementiert wurden und zum anderen mit der eigentlichen Umsetzung der App. Der dritte Abschnitt befasst sich mit der Umsetzung eines Sniffers, sprich eines Programms zur Paketanalyse der Netzwerkpakete.
+\\
+Desweiteren wird die Umsetzung des Servers beschrieben, sowie die Abspeicherung der Daten.
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -82,20 +84,152 @@ Der Sniffer ist zur Erfassung von Datenpaketen des Netzwerkverkehrs. Die Erfassu
 Aufgrund der Tatsache, dass es in Java auf Socket-Ebene keine Pakete, sondern nur Datenströme gibt, musste der Sniffer in C umgesetzt werden.
 Der Sniffer arbeit auf Raw-Socket-Ebene. Dies bedeutet, dass Pakete direkt gesendet oder empfangen werden können, ohne Formatieung von darüber liegenden Transportprotokollen. Der Sniffer ist so implementiert, dass er auf unterschiedliche Protokollarten (TCP, UDP, ICMP, ...) reagieren kann. 
 Allerdings werden nur bei TCP-basierten Paketen Ausgaben erzeugt. Diese Ausgaben beschränken sich auf die Quell- und Zieladresse sowie die Größe und den Zeitstempel des Paketes. Als Einschränkung der Ausgaben kann eine IP-Adresse bei Start des Sniffers übergeben werden, sodass nur Paketinformationen zu Paketen ausgegeben werden, bei denen die Quell- oder Zieladresse identisch mit der übergebenen Adresse ist. Eine weitere Einschränkung ist die Paketgröße. Pakete die kleiner als 100 Byte sind, werden nicht ausgegeben. Dies hat den Grund, dass Paketproben der App immer größer als 100 Byte sind und somit für die Berechnung unwichtige Kontrollnachrichten wie Acknowledgements direkt gefiltert werden.
-\\
-Einbindung mittels JNI/NDK ...
+\\\\
+Mit dem Native Development Kit (NDK) von Android, welches eine Sammlung von Bilbliotheken zur Verwendung von nativen Programmiersprachen wie C oder C++ ist, kann der Sniffer in der App verwendet werden. Dazu wird der Sniffer-Code mit Hilfe des NDK kompiliert und die kompilierte Datei des Sniffers wird im entsprechenden Ordner der App für zusätzliche Dateien hinterlegt. Der Code wird bei Nutzung der App aus diesem Ordner kopiert und verwendet.
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{App}
 
-- Aufteilung der App (Sichten)
+Die wesentlichen Informationen einer App werden über eine Manifest-Datei dem System bekannt gemacht. Zu diesen Informationen zählt zum einen die minimale Android-Version unter der die App noch reibungslos funktioniert sowie die Version, für die die App konzipiert wird. Darüber hinaus stehen in der Manifest-Datei die Komponenten, aus der die App besteht. Die App besteht aus den drei wesentlichen Komponenten Aktivität, BroadcastReceiver und Service.
+\\\\
+\textbf{Aktivität}
 \\
-- Funktionsumsetzung
+Eine Aktivität beschreibt eine einzelne Sicht einer App. Eine Aktivität hat einen Lebenszyklus der die verschiedenen Stadien beschreibt, in der sich eine App befinden kann. Anhand des Lebenszyklus können in den verschiedenen Stadien entsprechende Aktionen ausgeführt werden.
+\\\\
+\textbf{BroadcastReceiver}
 \\
-Android API
+Der BroadcastReceiver empfängt Nachrichten, welche vom System oder anderen Apps verschickt werden. Diese Nachrichten können zum Beispiel angeben, dass die Batterieleistung niedrig ist, oder der Bildschirm ausgeschaltet wurde.
+\\\\
+\textbf{Service}
 \\
-Bild der App/Schematische Darstellung Messvorgang
+Ein Service ist ein Prozess, welcher im Hintergrund ausgeführt wird. Dies ist von Vorteil bei lang andauernden Operationen oder bei sich periodisch wiederholenden Operationen.
+\\\\
+Neben den Komponenten benötigen viele Apps Berechtigungen, um auf Systemeigenschaften zuzugreifen. 
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|c|p{9cm}|}
+		\hline
+			\textbf{Berechtigung} & \textbf{Beschreibung}  \\
+		\hline
+			Internet & Erlaubt Applikationen Sockets zu öffnen  \\
+		\hline
+			Access\_Network\_State & Erlaubt Applikationen Zugriiff auf Netzwerkinformationen \\
+		\hline
+			Access\_Wifi\_State & Erlaubt Applikationen Zugriff auf Wifi-Informationen  \\
+		\hline
+			Access\_Coarse\_Location & Grobe Standortbestimmung über Standort des Funkmasten (Cell-ID) \\
+		\hline
+			Access\_Fine\_Location & Feine Standortbestimmung über die GPS-Daten des Gerätes \\
+		\hline
+			Receive\_Boot\_Completed & Erlaubt Applikationen sich selbst auszuführen, nachdem das Telefon gestartet wurde  \\
+		\hline
+		\end{tabular}
+	\caption{Benötigte Berechtigungen der App}
+	\label{t-permissions}
+\end{table}
+
+Diese Berechtigungen müssen in der Manifest-Datei beschrieben werden. Der Nutzer wird daraufhin bei der Installation der App über diese informiert, und muss zur Nutzung der App diesen Berechtigungen zustimmen. Die Berechtigungen für diese App sind in Tabelle \ref{t-permissions} zusammengefasst. Das Zusammenspiel der einzelnen Komponenten ist in Abbildung \ref{component-overview} schematisch dargestellt und wird im Folgenden erläutert.
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=0.52]{images/App-Component-Overview.png}
+		\caption{Schematischer Aufbau der App}
+		\label{component-overview}
+\end{figure}
+
+Die App ist optisch in zwei Bereiche aufgeteilt, besitzt somit zwei Hauptaktivitäten. Zum einen gibt es die Startaktivität \ref{overview} auf der eine Übersicht mit Statistiken, sowie einer Nachrichtenkonsole und der Steuerung angezeigt wird. Darüber hinaus gibt es eine Ergebnisaktivität \ref{resultsview}, in der die Messergebnisse in ausklappbaren Listen angezeigt werden. Zusätzlich zu den beiden Aktivitäten gibt es eine Einstellungsaktivität \ref{settingsview} über die der Benutzer die Rahmenbedingungen für die Messungen einstellen kann.
+
+\begin{figure}[htbp]
+\begin{minipage}[hbt]{0,325\textwidth}
+	\centering
+		\includegraphics[scale=0.11]{images/App-Overview.png}
+		\caption{Startaktivität}
+		\label{overview}
+\end{minipage}
+\begin{minipage}[hbt]{0,325\textwidth}
+	\centering
+		\includegraphics[scale=0.11]{images/App-Resultsview.png}
+		\caption{Ergebnisaktivität}
+		\label{resultsview}
+\end{minipage}
+\begin{minipage}[hbt]{0,325\textwidth}
+	\centering
+		\includegraphics[scale=0.11]{images/App-Settingsview.png}
+		\caption{Einstellungsaktivität}
+		\label{settingsview}
+\end{minipage}
+\end{figure}
+
+Das Umschalten zwischen den Aktivitäten erfolgt über die Schaltflächen am unteren Rand jeder Sicht ausgenommen die Einstellungsaktivität. Diese wird über das Symbol am oberen rechten Rand aus den beiden anderen Aktivitäten aufgerufen. Die Startaktivität hat drei zusätzliche Schaltflächen, über die Messungen gestartet und gestoppt werden können. Es kann eine einzelne Messung oder die Automatik über eine Schaltfläche gestartet werden. Die Automatik führt in bestimmten zeitlichen Abständen die Messungen durch. Diese kann durch die dritte Schaltfläche jederzeit beendet werden.
+\\\\
+Der Lebenszyklus der Startaktivität ist wichtig, da somit alle wichtigen Funktionen der App initialisiert werden. Zum besseren Verständnis des Lebenszyklus ist dieser in Abbildung \ref{process-diagramm} dargestellt. 
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.6]{images/activity-lifecycle.png}
+		\caption[\url{https://developer.android.com/images/training/basics/basic-lifecycle.png}]{Lebenszyklus einer Aktivität}
+		\label{activity-lifecycle}
+\end{figure}
+
+Der Lebenszklus umfasst viele Stadien, wovon die Methoden onCreate(), onStop() und onDestroy() entscheidend für diese App sind.
+\\\\
+\textbf{onCreate()}
+\\
+In dieser Methode werden alle grafischen Elemente der Hauptaktivität initialisiert. Dies gilt im Übrigen auch für die onCreate()-Methoden der anderen Aktivitäten. Darüber hinaus wird bei der Methode der Hauptaktivität zusätzlich noch abgefragt, ob Root-Rechte vorliegen. Dies ist wichtig für den nächsten Schritt der Methode. Dort werden Operationen ausgeführt, die den Sniffer betreffen, welcher nur mit Root-Rechten gestartet werden kann. Erster Schritt bei der Verwendung des Sniffers ist es, den kompilierten Code aus dem App-Ordner zu kopieren, da er dort nicht ausgeführt werden kann. Der Code wird stattdessen in den internen Speicherort der App kopiert, wo er ausgeführt werden kann. Wenn dies erledigt ist, wird der Sniffer über einen in Java initialisierten Prozess ausgeführt. Dies funktioniert, da mit Hilfe dieses Prozess Kommandozeilen-Befehle ausgeführt werden können.
+\\\\
+\textbf{onStop()}
+\\
+In dieser Methode werden die gesammelten Ergebnisse gespeichert. Wenn die App geöffnet ist, werden die Ergebnisse vorerst temporär im Datenmodell festgehalten, um nicht bei jeder Messung Daten ins Dateisystem zu schreiben. Wenn die App angehalten wird, werden vorher alle bis dahin gesammelten Ergebnisse in eine Datei gespeichert. Die Daten werden dabei nicht in der onDestroy()-Methode gespeichert, da es passieren kann, dass diese Methode nicht aufgerufen wird.
+\\\\
+\textbf{onDestroy()}
+\\
+In dieser Methode wird der laufende Service beendet. Wenn die App gerade in einer laufenden Messung ist und beendet wird, wird der Service für die laufende Messung ebenfalls beendet, egal ob es eine einmalige Messung, oder die automatische Messung ist.
+\\\\
+Der BroadcastReceiver der App ist zur Erkennung, dass das Telefon gestartet wurde. Dies ist nötig, damit die automatische Messung auch nach Neustart des Telefons aktiv bleibt. Ebenso wird darüber auch die automatische Messung gestartet. Der BroadcastReceiver initialisiert einen AlarmManager. Ein AlarmManager ist eine Systemressource und mittels dieser kann zu einem bestimmten Zeitpunkt oder auch periodisch ein Service gestartet werden. Der AlarmManager wird so initialisiert, dass er periodisch einen Service startet. Dies wird solange fortgesetzt, bis die Automatik der App vom Benutzer ausgeschaltet wird.
+\\\\
+Der Service der App misst die Bandbreite. Der schematische Ablauf des Services ist in Abbildung \ref{process-diagramm} dargestellt. 
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=0.6]{images/Process-Diagramm.png}
+		\caption{Schematischer Ablauf einer Messung}
+		\label{process-diagramm}
+\end{figure}
+
+Der Service wird periodisch durch den Alarm oder aber einmalig durch den Benutzer ausgelöst. Nach erfolgreicher Messung beendet sich der Service, damit er nicht im Speicher bleibt und Ressourcen verschwendet. Bevor die eigentliche Messung gestartet wird, startet der Service den Sniffer, um Pakete empfangen zu können. Dieser wird beendet, nachdem die Messungen ausgeführt wurden. Die vom Sniffer empfangenen Pakete werden nach Ausführung der eigentlichen Messung ausgewertet. Bei geöffneter App werden die Ergebnisse temporär im Datenmodell gespeichert und die entsprechenden Aktivitäten über einen weiteren BroadcastReceiver vom Service über Aktualisierungen informiert. Bei geschlossener App wird das Ergebnis in eine Datei gespeichert bevor der Service beendet wird.
+
+Die Datenspeicherung erfolgt temporär in einem Datenmodell. Das Datenmodell besteht im Wesentlichen aus drei Klassen, die in Abbildung \ref{classdiagram-model} dargestellt sind. 
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=0.9]{images/Classdiagram-Model.png}
+		\caption{Klassendiagramm Datenmodell}
+		\label{classdiagram-model}
+\end{figure}
+
+Die Objekte der Klasse Bandwidths beinhalten die konkreten Bandbreitenmessungen, sowie die Bezeichnung für die jeweilige Messmethode. Die Klasse Results repräsentiert alle Daten eines einzelnen Messvorgangs. Ein Objekt dieser Klasse speichert neben einer Anzahl n an Bandwidths-Objekten weitere wichtige Parameter, welche in Tabelle \ref{t-collected-userdata} bereits erläutert wurden.
+\\\\
+Um die Messdaten persistent abzuspeichern werden diese im internen Speicher des Telefons als Datei abgespeichert. Dafür werden die Informationen der Results-Objekte in JSON formatiert und abgespeichert. Die vorgenommenen Einstellungen des Benutzers und andere kleinere Daten werden mit Hilfe der von Android standardmäßig implementierten Klasse SharedPreferences gespeichert. Mittels dieser Klasse lassen sich nur einfache Datenstrukturen abspeichern sodass diese Klasse zur Speicherung der Results-Objekte nicht geeignet ist. Die Informationen werden ebenfalls als Datei im internen Speicher des Telefons im xml-Format abgelegt.
+\\\\
+Die abgespeicherten Daten werden einmal pro Tag an den Server gesendet. Dabei wird wieder ein Service verwendet. Dieser wird ebenfalls über einen AlarmManager gestartet. Der Service läd die Daten aus der gespeicherten Datei und sendet diese an den Server. Der Server antwortet ob die Daten gespeichert wurden, oder nicht. Wenn der Server die Speicherung bestätigt, werden die Daten vom Gerät gelöscht.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Server}
+
+Der Server hat zwei Hauptfunktionen. Zum einen werden über den Server Pakete zur Bandbreitenbestimmung ausgetauscht und zum anderen ist dieser zuständig für die Speicherung der zugesendeten Daten der einzelnen Geräte. Da sich prinzipiell Clients beliebiger Anzahl gleichzeitig mit dem Server verbinden können, ist dieser so ausgelegt, dass die einzelnen akzeptierten Verbindungen an Threads ausgelagert werden. Um die Verbindungsgrenze nach oben hin zu limitieren wird ein ThreadPoolExecutor verwendet. Mittels dieser von Java bereitgestellten Klasse lassen sich Threads effizient parallelisieren. Zusätzliche Funktionen beschränken unter anderem die maximale Anzahl an Threads.
+\\\\
+Die mit einem Client verbundenen Threads reagieren auf unterschiedliche Nachrichtentypen, sodass auf die jeweilige Messmethode passend reagiert werden kann. Aus diesem Grund verwendet der Client bei Anfrage für eine Messmethode eine Zeichenfolge, damit die Gegenseite die entsprechenden Pakete zurücksenden kann. Gleiches passiert bei der Datenspeicherung. Der Client sendet vor den eigentlichen Daten eine Zeichenfolge, damit der Server erkennt, dass Daten zur Abspeicherung folgen. Die Daten werden mit Hilfe von JDBC (Java Database Connectivity) in eine Datenbank gespeichert. JDBC ist eine Schnittstelle und bietet Funktionen zur Verbindung mit Datenbanken unterschiedlicher Hersteller.
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\subsubsection{Datenbank}
+
+Zur persistenten Datenspeicherung wird eine PostgreSQL Datenbank verwendet. Die Entscheidung für diese Datenbank wurde auf Grundlage der Erweiterung PostGIS für diese Datenbank gewählt. PostGIS ist eine Erweiterung die geografische Objekte und Funktionen umfasst. Mit Hilfe dieser Erweiterung können die gesammelten geograpfischen Koordinaten der einzelnen Geräte somit grafisch dargestellt werden.
+\\\\
+Die Daten werden in zwei Tabellen abgespeichert. Die Tabellen repräsentieren die Klassen des Datenmodells Results und Bandwidths.
 
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
